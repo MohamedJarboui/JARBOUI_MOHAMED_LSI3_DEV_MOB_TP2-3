@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My_First_Project</string>
+    <string name="titleApp">Mesure de niveau de glycémie</string>
+    <string name="age">"Votre age : "</string>
+    <string name="qs">Est-ce que vous jeunez?</string>
+    <string name="non">Non</string>
+    <string name="oui">Oui</string>
+    <string name="input">valeur mesuree(en mol)</string>
+    <string name="cs">CONSULTER</string>
+</resources>
