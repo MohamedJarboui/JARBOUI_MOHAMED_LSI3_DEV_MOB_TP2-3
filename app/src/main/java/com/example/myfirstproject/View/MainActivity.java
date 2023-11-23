@@ -1,4 +1,4 @@
-package com.example.myfirstproject;
+package com.example.myfirstproject.View;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +13,8 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.myfirstproject.R;
 
 public class MainActivity extends AppCompatActivity {
     private EditText vm;

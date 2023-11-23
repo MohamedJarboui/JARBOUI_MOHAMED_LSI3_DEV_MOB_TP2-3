@@ -15,6 +15,9 @@ public class Patient {
         this.valeur = valeur;
     }
 
+    public Patient(int age, String vm, boolean jeuner) {
+    }
+
     public int getAge() {
         return age;
     }
