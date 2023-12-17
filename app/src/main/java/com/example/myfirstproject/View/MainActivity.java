@@ -1,108 +1,136 @@
 package com.example.myfirstproject.View;
 
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myfirstproject.R;
+import com.example.myfirstproject.controler.Controler;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText vm;
+    private final int REQUEST_CODE = 1 ;
+    private EditText etValeur;
+    private Button btnConsulter;
+    private RadioButton rbtoui;
+    private RadioButton rbtnon;
     private SeekBar sbAge;
-    private TextView res;
-    private Button btn;
-    private RadioGroup rbGrp;
-    private TextView agePrv;
-    private boolean Jeuner = true;
+    private TextView tvage ; //tvresultat;
+    //L'instance de la classe Controller.
+    private Controler controller  = Controler.getInstance();
 
-    private RadioButton oui;
-    private RadioButton no;
-    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //seakbar Listnear explicite
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        agePrv = findViewById(R.id.tvAge);
-        vm = findViewById(R.id.etvaleur);
-        sbAge = findViewById(R.id.skAGE);
-        res = findViewById(R.id.res);
-        rbGrp = findViewById(R.id.ON);
-        btn = findViewById(R.id.btnConsulter);
-        oui = findViewById(R.id.oui);
-        no = findViewById(R.id.cRB);
-
-        if (oui.isChecked()) {
-
-            Jeuner = true;
-        } else if (no.isChecked()) {
-
-            Jeuner = false;
-        }
-        sbAge.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        // Initialisation des éléments de l'interface utilisateur
+        init();
+        // Ajout d'un écouteur de clic sur le bouton Consulter
+        btnConsulter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Update the TextView with the current progress value
-
-                agePrv.setText("Votre age :"+String.valueOf(progress));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                Toast.makeText(MainActivity.this, "Stop", Toast.LENGTH_SHORT).show();
-            }
-        });
-        String vmText = vm.getText().toString().trim();
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                vm.clearFocus();
-                int age = sbAge.getProgress();
-                String vmText = vm.getText().toString().trim(); // Get the trimmed text
-
-                // Check if age is greater than 0 and vmText is not empty
-                if (age > 0 && !vmText.isEmpty()) {
-                    double valeurM = Double.parseDouble(vmText);
-
-                    if (Jeuner) {
-                        if (age >= 13 && (valeurM >= 5.0 && valeurM <= 7.2)) {
-                            res.setText("Niveau de glycémie est normale 1");
-                        } else if (age >= 6 && (valeurM >= 5.0 && valeurM <= 10.0)) {
-                            res.setText("Niveau de glycémie est normale 2");
-                        } else if (valeurM >= 5.5 && valeurM <= 10.0) {
-                            res.setText("Niveau de glycémie est normale 3");
-                        } else {
-                            res.setText("Niveau de glycémie est trop bas ou niveau de glycémie est trop élevée 1");
-                        }
-                    } else {
-                        if (age >= 13 && valeurM < 10.5) {
-                            res.setText("Niveau de glycémie est normale");
-                        } else {
-                            res.setText("Niveau de glycémie est trop bas ou niveau de glycémie est trop élevée 2");
-                        }
-                    }
-                    vm.setText("");
-                    sbAge.setProgress(0);
+            public void onClick(View v) {
+                //Controle de saisie
+                int age;
+                float valeurmasuree;
+                boolean verifage = false;
+                boolean verifvaleur = false;
+                if (sbAge.getProgress() != 0) {
+                    verifage = true;
                 } else {
-                    Toast.makeText(MainActivity.this, "Niveau de glycémie or age are empty", Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(MainActivity.this, "Veuillez vérifier votre age", Toast.LENGTH_SHORT).show();
                 }
-            }
+                if (!etValeur.getText().toString().isEmpty()) {
+                    verifvaleur = true;
+                } else {
+                    Toast.makeText(MainActivity.this, "Veuillez vérifier la valeur mesurée", Toast.LENGTH_LONG).show();
+                }
+                if (verifage && verifvaleur) {
+                    //Traitement
+                    age = sbAge.getProgress();
+                    valeurmasuree = Float.valueOf(etValeur.getText().toString());
+                    boolean isFasting = rbtoui.isChecked();
+                    // User Action view -> controller
+                    controller.createPatient(age ,valeurmasuree , isFasting , isChild());
+
+                    // tvresultat.setText(controller.getRes());
+                    Intent intent = new Intent(MainActivity.this,consult.class);
+                    intent.putExtra("reponse",controller.getRes());
+                    startActivityForResult(intent , REQUEST_CODE);
+
+
+                }}
         });
+
+        // Ajout d'un écouteur de changement de progression sur la SeekBar sbAge
+        //Seakbar Listnear implicite
+        sbAge.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                             @Override
+                                             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                                 Log.i("Information", "onProgressChanged " + progress);
+                                                 // Affichage dans le Log de Android studio pour voir les changements détectés sur le SeekBar ..
+                                                 tvage.setText("Votre âge : " + progress);
+                                                 // Mise à jour du TextView par la valeur : progress à chaque changement.
+
+                                             }
+
+                                             @Override
+                                             public void onStartTrackingTouch(SeekBar seekBar) {
+                                             }
+
+                                             @Override
+                                             public void onStopTrackingTouch(SeekBar seekBar) {
+                                             }
+                                         }
+        );
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_CODE)
+            if(resultCode==RESULT_CANCELED)
+                Toast.makeText(MainActivity.this,"Erreur",Toast.LENGTH_SHORT).show();
+    }
+
+    /*public void init()
+    {
+        etValeur = (EditText) findViewById(R.id.edittext);
+        sbAge = (SeekBar) findViewById(R.id.sbAge);
+        btnConsulter =(Button) findViewById(R.id.btnconsulter);
+        rbIsFasting =(RadioButton) findViewById(R.id.rbtoui);
+        rbIsNotFasting =(RadioButton) findViewById(R.id.rbtnon);
+        tvAge =(TextView) findViewById(R.id.tvAge);
+        //tvres = (TextView) findViewById(R.id.btnconsulter);
+        Intent intent=new Intent(MainActivity.this,ConsulteActivity.class);
+        intent.putExtra("réponse",controller.getResult());
+
+    }
+*/
+    // Initialisation des éléments de l'interface utilisateur
+    private void init() {
+        etValeur =(EditText) findViewById(R.id.edittext);
+        btnConsulter =(Button) findViewById(R.id.btnConsulter);
+        rbtoui = (RadioButton)findViewById(R.id.rbtoui);
+        rbtnon= (RadioButton)findViewById(R.id.rbtnon);
+        sbAge= (SeekBar)findViewById(R.id.sbAge);
+        tvage= (TextView)findViewById(R.id.tvage);
+        //tvresultat=(TextView) findViewById(R.id.tvresultat);
+        Intent intent = new Intent(MainActivity.this , consult.class);
+        intent.putExtra("reponse" , controller.getRes());
 
     }
 }

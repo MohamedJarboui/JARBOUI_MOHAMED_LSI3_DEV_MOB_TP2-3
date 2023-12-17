@@ -2,79 +2,69 @@ package com.example.myfirstproject.model;
 
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.View;
 
 public class Patient {
+    //Les attributs de la classe Patient
     private int age;
-    private boolean j;
     private float valeur;
-    private String resultat;
-
-    public Patient(int age, boolean j, float valeur) {
+    private boolean isFasting;
+    private String res;
+    //Notify controle -> Model
+    //Le Constructeur
+    public Patient(int age, float valeur, boolean isFasing) {
         this.age = age;
-        this.j = j;
         this.valeur = valeur;
+        this.isFasting = isFasing;
+        calculer();
     }
-
-    public Patient(int age, String vm, boolean jeuner) {
-    }
-
+    //Les getters et Les setters
     public int getAge() {
         return age;
     }
-
-    public boolean isJ() {
-        return j;
-    }
-
     public float getValeur() {
         return valeur;
     }
-
-    public String getResultat() {
-        return resultat;
+    public boolean isFasting() {
+        return isFasting;
     }
-
-    public void setAge(int age) {
-        this.age = age;
+    //Update Model -> Control
+    public String getRes(){
+        return res;
     }
+    //Méthode Calculer qui analyse le niveau de glycémie
+    private void calculer() {
 
-    public void setJ(boolean j) {
-        this.j = j;
-    }
-
-    public void setValeur(float valeur) {
-        this.valeur = valeur;
-    }
-
-    public void setResultat(String resultat) {
-        this.resultat = resultat;
-    }
-
-
-        private void cal(){
-        if (age > 0) {
-            if (j) {
-                if (age >= 13 && (valeur >= 5.0 && valeur <= 7.2)) {
-                    resultat = "Niveau de glycémie est normale 1";
-                } else if (age >= 6 && (valeur >= 5.0 && valeur <= 10.0)) {
-                    resultat = "Niveau de glycémie est normale 2";
-                } else if (valeur >= 5.5 && valeur <= 10.0) {
-                    resultat = "Niveau de glycémie est normale 3";
-                } else {
-                    resultat = "Niveau de glycémie est trop bas ou niveau de glycémie est trop élevée 1";
-                }
+        if (isFasting) {
+            if (age >= 13) {
+                if (valeur< 5)
+                    res="Niveau de glycémie est bas";
+                else if (valeur >= 5 && valeur <= 7.2)
+                    res="Niveau de glycémie est normale";
+                else
+                    res="Niveau de glycémie est élevé";
+            } else if (age >= 6 && age <= 12) {
+                if (valeur < 5)
+                    res="Niveau de glycémie est bas";
+                else if (valeur>= 5 && valeur <= 10)
+                    res="Niveau de glycémie est normale";
+                else
+                    res="Niveau de glycémie est élevé";
+            } else if (age < 6) {
+                if (valeur < 5.5)
+                    res="Niveau de glycémie est bas";
+                else if (valeur >= 55 && valeur <= 10.0)
+                    res="Niveau de glycémie est normale";
+                else
+                    res="Niveau de glycémie est élevé ";
             } else {
-                if (age >= 13 && valeur < 10.5) {
-                    resultat = "Niveau de glycémie est normale";
-                } else {
-                    resultat = "Niveau de glycémie est trop bas ou niveau de glycémie est trop élevée 2";
-                }
+                //false
+                if (valeur > 10.5)
+                    res="Niveau de glycémie est élevé ";
+                else
+                    res="Niveau de glycémie est normale ";
             }
-
         }
-
-
     }
-
-    }
+}
 
